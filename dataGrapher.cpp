@@ -1,6 +1,6 @@
 #include <vector>
 #include <cstdlib>
-#include ""
+#include "dataPoint.hpp"
 
 class dataGrapher
 {
