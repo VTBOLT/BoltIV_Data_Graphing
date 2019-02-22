@@ -8,26 +8,26 @@ def main(argv):
 	try:
 		opts, args = getopt.getopt(argv,"hp:q:",["ifile="])
 	except getopt.GetoptError:
-		print('dataGrapher.py -[option]\n-p <inputfile>\t--prettyPrint\n-q <inputStream>\t--quickPrint')
+		print('dataGrapher.py -[option]\n\t--prettyPrint\t-p <input file>\n\t--quickPrint\t-q <input stream>\t')
 		sys.exit(2)
 	for opt, arg in opts:
 		if opt == '-h':
-			print('dataGrapher.py -[option]\n-p <inputfile>\t--prettyPrint\n-q <inputStream>\t--quickPrint')
+			print('dataGrapher.py takes a csv and prints it to a graph. Default file is data.csv and default setting is pretty print.')
+			print('dataGrapher.py -[option]\n\t--prettyPrint\t-p <input file>\n\t--quickPrint\t-q <input stream>\t')
 			sys.exit()
 		elif opt in ("-p", "--prettyPrint"):
 			inputfile = arg
 			with open(inputfile, mode='r') as csv_file:
 				csv_reader = csv.DictReader(csv_file)
-				line_count = 0
+				line_count = 1
+				firstLine=next(csv_reader)
+				head = [row for row in firstLine]
 				for row in csv_reader:
-					if line_count == 0:
-						print('Column names are {0}'.format(", ".join(row)))
-						line_count += 1
-						vary = float(row["BOLT3_New_Param::M165_Motor_Position_Info::D2_Motor_Speed"])
-						if vary > 0:
-							x.append(float(row["Time [s]"]))
-							y.append(vary)
-							line_count += 1
+					line_count += 1
+					vary = float(row[head[1]])
+					if vary > 0:
+						x.append(float(row[head[0]]))
+						y.append(vary)
 				print('Processed {0} lines.'.format(line_count))
 				plt.scatter(x,y)
 				plt.show()
