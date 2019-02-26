@@ -29,7 +29,8 @@ def main(argv):
 						x.append(float(row[head[0]]))
 						y.append(vary)
 				print('Processed {0} lines.'.format(line_count))
-				plt.scatter(x,y)
+				plt.plot(x,y,1)
+				plt.autoscale(enable=True,axis='both',tight=None)
 				plt.show()
 		elif opt in ("-q", "--quickPrint"):
 			inputfile = arg
