@@ -2,11 +2,9 @@ import csv, sys, getopt
 import matplotlib.pyplot as plt
 
 def main(argv):
-	inputfile = 'data.csv'
-	x = []
-	y = []
+	points = [[]]
 	try:
-		opts, args = getopt.getopt(argv,"hp:q:",["ifile="])
+		opts, args = getopt.getopt(argv,"hp:q",["ifile="])
 	except getopt.GetoptError:
 		print('dataGrapher.py -[option]\n\t--prettyPrint\t-p <input file>\n\t--quickPrint\t-q <input stream>\t')
 		sys.exit(2)
@@ -22,19 +20,33 @@ def main(argv):
 				line_count = 1
 				firstLine=next(csv_reader)
 				head = [row for row in firstLine]
+				for row in head:
+					points.append([])
 				for row in csv_reader:
 					line_count += 1
 					vary = float(row[head[1]])
 					if vary > 0:
-						x.append(float(row[head[0]]))
-						y.append(vary)
+						points[0].append(float(row[head[0]]))
+						points[1].append(vary)
 				print('Processed {0} lines.'.format(line_count))
-				plt.plot(x,y,1)
+				plt.plot(points[0],points[1],1)
 				plt.autoscale(enable=True,axis='both',tight=None)
 				plt.show()
 		elif opt in ("-q", "--quickPrint"):
-			inputfile = arg
-			quickParse(inputfile)
+			points[0].append(input("enter x val: "))
+			points[1].append(input("enter y val: "))
+			plt.ion()
+			plt.plot(points[0],points[1])
+			plt.show()
+			while 1:
+				try:
+					plt.plot(points[0],points[1])
+					plt.autoscale()
+					plt.draw()
+					points[0].append(input("enter x val: "))
+					points[1].append(input("enter y val: "))
+				except KeyboardInterrupt:
+					raise
 	print( 'Input file is ', inputfile)
 
 if __name__ == "__main__":
