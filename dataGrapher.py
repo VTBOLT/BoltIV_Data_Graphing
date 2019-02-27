@@ -24,12 +24,12 @@ def main(argv):
 					points.append([])
 				for row in csv_reader:
 					line_count += 1
-					vary = float(row[head[1]])
-					if vary > 0:
-						points[0].append(float(row[head[0]]))
-						points[1].append(vary)
+					for i in range(len(head)):
+						points[i].append(float(row[head[i]]))
 				print('Processed {0} lines.'.format(line_count))
-				plt.plot(points[0],points[1],1)
+				for i in range(len(head)-1):
+					plt.figure(i+1)
+					plt.plot(points[0],points[i+1],1)
 				plt.autoscale(enable=True,axis='both',tight=None)
 				plt.show()
 		elif opt in ("-q", "--quickPrint"):
