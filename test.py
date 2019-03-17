@@ -1,7 +1,7 @@
-import csv, sys, getopt, time
+import csv
 import matplotlib.pyplot as plt
 
-def main(argv):
+def main():
 	points = [[]]  # points[index] contains and array of all points for that column
 	edgePoints = [[float('inf'),float('-inf')]]  # edgepoint[index] will contain max at 1 and min at 0
 	inputfile = 'data2.csv'
@@ -78,4 +78,4 @@ def main(argv):
 		input("press enter to close graph")
 		print('Processed {0} lines.'.format(line_count))
 if __name__ == "__main__":
-   main(sys.argv[1:])
+   main()
