@@ -1,5 +1,9 @@
 import csv, sys, getopt
 import matplotlib.pyplot as plt
+from digi.xbee.devices import XBeeDevice
+
+PORT = "COM6"
+BAUD_RATE = 57600
 
 def main(argv):
 	points = [[]]      # points[index] contains and array of all points for that column
@@ -52,21 +56,14 @@ def main(argv):
 				plt.show()
 		#deal with quick (realtime) print
 		elif opt in ("-q", "--quickPrint"):
-			points[0].append(input("enter x val: "))
-			points[1].append(input("enter y val: "))
-			plt.ion()
+			device = XBeeDevice(PORT, BAUD_RATE)
+			device.open()
+			message = xbee_message.data.decode()
+			row = [s.strip() for s in message.split(',')]
+			for i in range(len(row)):
+				points[i] = row[i]
 			plt.plot(points[0],points[1])
 			plt.show()
-			while 1:
-				try:
-					plt.plot(points[0],points[1])
-					plt.autoscale()
-					plt.draw()
-					points[0].append(input("enter x val: "))
-					points[1].append(input("enter y val: "))
-				except KeyboardInterrupt:
-					raise
-
 #dont know what this does but we need it
 if __name__ == "__main__":
    main(sys.argv[1:])
