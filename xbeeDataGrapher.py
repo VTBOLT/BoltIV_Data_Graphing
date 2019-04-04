@@ -19,14 +19,14 @@ def main():
 		points.append([0])
 	points[0][0]=1
 	props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
-	ax1=plt.subplot(331)
-	ax2=plt.subplot(332)
-	ax3=plt.subplot(333)
-	ax4=plt.subplot(334)
-	ax5=plt.subplot(335)
-	ax6=plt.subplot(336)
-	ax7=plt.subplot(325)
-	ax8=plt.subplot(326)
+	ax4=plt.subplot(331)#Volt
+	ax2=plt.subplot(332)#FPV
+	ax3=plt.subplot(333)#TEMP
+	ax1=plt.subplot(323)#SOC
+	ax8=plt.subplot(324)#RPM
+	ax6=plt.subplot(337)#Gyro
+	ax5=plt.subplot(338)#Lat
+	ax7=plt.subplot(339)#Aux/Pump
 	plt.ion()
 	plt.show()
 	checksum_err = 0
@@ -38,18 +38,17 @@ def main():
 			try:
 				global count
 				message = xbee_message.data.decode()
-				row = [s.strip() for s in message.replace('\x00','').split(',')]
-				points.append([])
-				
-				count +=1
-				points[0].append(count)
-				
-				for i in range(len(row)):
-					points[i+1].append(row[i])
-					if float(row[i]) < edgePoints[i+1][0]:
-						edgePoints[i+1][0] = float(row[i])
-					if float(row[i]) > edgePoints[i+1][1]:
-						edgePoints[i+1][1] = float(row[i])
+				row = [s.strip() for s in message.replace('\x00','').replace('\t','').split(',')]
+				if len(row) == (len(head)-1):
+					points.append([])
+					count +=1
+					points[0].append(count)
+					for i in range(len(row)):
+						points[i+1].append(row[i])
+						if float(row[i]) < edgePoints[i+1][0]:
+							edgePoints[i+1][0] = float(row[i])
+						if float(row[i]) > edgePoints[i+1][1]:
+							edgePoints[i+1][1] = float(row[i])
 			except Exception as e:
 				print(e)
 				print('mesage receive')
@@ -68,7 +67,12 @@ def main():
 						ax1.plot(points[0][-100:-1],points[1][-100:-1],'k')
 					textstr = '\n'.join((("Max: {}".format(edgePoints[1][1])),("Min: {}".format(edgePoints[1][0])), "Latest: {}".format(points[1][-1])))
 					ax1.set_title(head[1])#State Of Charge
-					ax1.text(0.05, 0.95, textstr, transform=ax1.transAxes, fontsize=14, verticalalignment='top', bbox=props)
+					ax1.text(0.02, 0.95, textstr, transform=ax1.transAxes, fontsize=14, verticalalignment='top', bbox=props)
+					#ax1.xaxis.set_visible(False)
+					#ax1.hlines(95, 0, 100, colors='g', linestyles='dashed', label='')
+					#ax1.hlines(30, 0, 100, colors='y', linestyles='dashed', label='')
+					#ax1.hlines(15, 0, 100, colors='r', linestyles='dashed', label='')
+					#ax1.set_ylim([0,100])
 					#ax1.xaxis.set_major_locator(plticker.MultipleLocator(base = 20.0))
 					#ax1.yaxis.set_major_locator(plticker.MultipleLocator(base = 20.0))
 			except Exception as e:
@@ -84,7 +88,12 @@ def main():
 						ax2.plot(points[0][-100:-1],points[2][-100:-1],'g')
 					textstr = '\n'.join((("Max: {}".format(edgePoints[2][1])),("Min: {}".format(edgePoints[2][0])), "Latest: {}".format(points[2][-1])))
 					ax2.set_title(head[2])#Full Pack Voltage
-					ax2.text(0.05, 0.95, textstr, transform=ax2.transAxes, fontsize=14, verticalalignment='top', bbox=props)
+					ax2.text(0.03, 0.95, textstr, transform=ax2.transAxes, fontsize=14, verticalalignment='top', bbox=props)
+					ax2.xaxis.set_visible(False)
+					#ax2.set_ylim(200,750)
+					#ax2.hlines(698, line_count-100, line_count, colors='b', linestyles='dashed', label='')
+					#ax2.hlines(597, line_count-100, line_count, colors='k', linestyles='dashed', label='')
+					#ax2.hlines(480, line_count-100, line_count, colors='r', linestyles='dashed', label='')
 					#ax2.xaxis.set_major_locator(plticker.MultipleLocator(base = 20.0))
 					#ax2.yaxis.set_major_locator(plticker.MultipleLocator(base = 20.0))
 			except Exception as e:
@@ -102,7 +111,12 @@ def main():
 						ax3.plot(points[0][-100:-1],points[4][-100:-1],'b')
 					textstr = '\n'.join((("Max: {}".format(edgePoints[3][1])),("Min: {}".format(edgePoints[4][0])), "Latest: {}".format(points[3][-1])))
 					ax3.set_title("Min/Max Cell Temps")
-					ax3.text(0.05, 0.95, textstr, transform=ax3.transAxes, fontsize=14, verticalalignment='top', bbox=props)
+					ax3.text(0.03, 0.95, textstr, transform=ax3.transAxes, fontsize=14, verticalalignment='top', bbox=props)
+					ax3.xaxis.set_visible(False)
+					#ax3.set_ylim(20,90)
+					#ax3.hlines(40, line_count-100, line_count, colors='g', linestyles='dashed', label='')
+					#ax3.hlines(60, line_count-100, line_count, colors='y', linestyles='dashed', label='')
+					#ax3.hlines(80, line_count-100, line_count, colors='r', linestyles='dashed', label='')
 					#ax3.xaxis.set_major_locator(plticker.MultipleLocator(base = 20.0))
 					#ax3.yaxis.set_major_locator(plticker.MultipleLocator(base = 20.0))
 			except Exception as e:
@@ -120,7 +134,8 @@ def main():
 						ax4.plot(points[0][-100:-1],points[6][-100:-1],'b')
 					textstr = '\n'.join((("Max: {}".format(edgePoints[5][1])),("Min: {}".format(edgePoints[6][0])), "Latest: {}".format(points[5][-1])))
 					ax4.set_title("Min/Max Cell Volts")
-					ax4.text(0.05, 0.95, textstr, transform=ax4.transAxes, fontsize=14, verticalalignment='top', bbox=props)
+					ax4.text(0.03, 0.95, textstr, transform=ax4.transAxes, fontsize=14, verticalalignment='top', bbox=props)
+					ax4.xaxis.set_visible(False)
 					#ax4.xaxis.set_major_locator(plticker.MultipleLocator(base = 20.0))
 					#ax4.yaxis.set_major_locator(plticker.MultipleLocator(base = 20.0))
 			except Exception as e:
@@ -131,16 +146,20 @@ def main():
 				if (len(points[0]) == len(points[7])) and (len(points[0]) == len(points[8])) and (len(points[0]) == len(points[9])):
 					ax5.cla()
 					if count<100:
-						ax5.plot(points[0],points[7],'c')
-						ax5.plot(points[0],points[8],'m')
-						ax5.plot(points[0],points[9],'b')
+						ax5.plot(points[7],points[8],'g')
+						ax5.plot(points[7],points[9],'b')
 					else:
-						ax5.plot(points[0][-100:-1],points[7][-100:-1],'c')
-						ax5.plot(points[0][-100:-1],points[8][-100:-1],'m')
-						ax5.plot(points[0][-100:-1],points[9][-100:-1],'b')
+						ax5.plot(points[7][-100:-1],points[8][-100:-1],'g')
+						ax5.plot(points[7][-100:-1],points[9][-100:-1],'b')
 					textstr = '\n'.join((("Latest X: {}".format(points[7][-1])),("Latest Y: {}".format(points[8][-1])),("Latest Z: {}".format(points[9][-1]))))
-					ax5.text(0.05, 0.95, textstr, transform=ax5.transAxes, fontsize=14, verticalalignment='top', bbox=props)
+					ax5.text(0.03, 0.95, textstr, transform=ax5.transAxes, fontsize=14, verticalalignment='top', bbox=props)
 					ax5.set_title("IMU Lattitude")
+					ax5.set_xlim(-2,2)
+					ax5.set_ylim(-2,2)
+					ax5.hlines(-1, -1, 1, colors='g', linestyles='dashed', label='')
+					ax5.hlines(1, -1, 1, colors='g', linestyles='dashed', label='')
+					ax5.vlines(-1, -1, 1, colors='g', linestyles='dashed', label='')
+					ax5.vlines(1, -1, 1, colors='g', linestyles='dashed', label='')
 					#ax5.xaxis.set_major_locator(plticker.MultipleLocator(base = 20.0))
 					#ax5.yaxis.set_major_locator(plticker.MultipleLocator(base = 20.0))
 			except Exception as e:
@@ -151,16 +170,20 @@ def main():
 				if (len(points[0]) == len(points[10])) and (len(points[0]) == len(points[11])) and (len(points[0]) == len(points[12])):
 					ax6.cla()
 					if count<100:
-						ax6.plot(points[0],points[10],'c')
-						ax6.plot(points[0],points[11],'m')
-						ax6.plot(points[0],points[12],'b')
+						ax6.plot(points[10],points[11],'g')
+						ax6.plot(points[10],points[12],'b')
 					else:
-						ax6.plot(points[0][-100:-1],points[10][-100:-1],'c')
-						ax6.plot(points[0][-100:-1],points[11][-100:-1],'m')
-						ax6.plot(points[0][-100:-1],points[12][-100:-1],'b')
+						ax6.plot(points[10][-100:-1],points[11][-100:-1],'g')
+						ax6.plot(points[10][-100:-1],points[12][-100:-1],'b')
 					textstr = '\n'.join((("Latest X: {}".format(points[10][-1])),("Latest Y: {}".format(points[11][-1])),("Latest Z: {}".format(points[12][-1]))))
-					ax6.text(0.05, 0.95, textstr, transform=ax6.transAxes, fontsize=14, verticalalignment='top', bbox=props)
+					ax6.text(0.03, 0.95, textstr, transform=ax6.transAxes, fontsize=14, verticalalignment='top', bbox=props)
 					ax6.set_title("IMU Gyro")
+					ax6.set_xlim(-2,2)
+					ax6.set_ylim(-2,2)
+					ax6.hlines(-1, -1, 1, colors='g', linestyles='dashed', label='')
+					ax6.hlines(1, -1, 1, colors='g', linestyles='dashed', label='')
+					ax6.vlines(-1, -1, 1, colors='g', linestyles='dashed', label='')
+					ax6.vlines(1, -1, 1, colors='g', linestyles='dashed', label='')
 					#ax6.xaxis.set_major_locator(plticker.MultipleLocator(base = 20.0))
 					#ax6.yaxis.set_major_locator(plticker.MultipleLocator(base = 20.0))
 			except Exception as e:
@@ -176,9 +199,10 @@ def main():
 					else:
 						ax7.plot(points[0][-100:-1],points[13][-100:-1],'c')
 						ax7.plot(points[0][-100:-1],points[14][-100:-1],'m')
-					textstr = '\n'.join((("Max: {}".format(edgePoints[13][1])),("Min: {}".format(edgePoints[13][0])), "Latest: {}".format(points[5][-1])))
-					ax7.text(0.05, 0.95, textstr, transform=ax7.transAxes, fontsize=14, verticalalignment='top', bbox=props)
+					textstr = '\n'.join((("Max: {}".format(edgePoints[13][1])),("Min: {}".format(edgePoints[13][0])), "Latest: {}".format(points[13][-1])))
+					ax7.text(0.03, 0.95, textstr, transform=ax7.transAxes, fontsize=14, verticalalignment='top', bbox=props)
 					ax7.set_title("Aux Volt and Pump Volt")
+					ax7.xaxis.set_visible(False)
 					#ax7.xaxis.set_major_locator(plticker.MultipleLocator(base = 20.0))
 					#ax7.yaxis.set_major_locator(plticker.MultipleLocator(base = 20.0))
 			except Exception as e:
@@ -188,9 +212,16 @@ def main():
 			try:	
 				if (len(points[0]) == len(points[14])):
 					ax8.cla()
-					textstr = "null"
-					ax8.text(0.05, 0.95, textstr, transform=ax8.transAxes, fontsize=14, verticalalignment='top', bbox=props)
+					wheelCir = 1.979 #in meters
+					gearing= 55/14 #number of back sprocket teeth over front sprocket teeth
+					velocity = float(points[2][-1])/60 *wheelCir / gearing #rpm/60*wheel circum/gearing   -> meters per second
+					speed = velocity*2.23694 #convert meters per second to miles per hour
+					textstr = '\n'.join((("Max: {}".format(edgePoints[13][1])),("Latest: {}".format(points[13][-1])), ("Speed(MPH): {}".format(speed))))
+					ax8.text(0.02, 0.95, textstr, transform=ax8.transAxes, fontsize=14, verticalalignment='top', bbox=props)
 					ax8.set_title("Motor RPM")
+					ax8.xaxis.set_visible(False)
+					#ax8.set_ylim(0,12000)
+					#ax8.hlines(10000, line_count-100, line_count, colors='g', linestyles='dashed', label='')
 					#ax8.xaxis.set_major_locator(plticker.MultipleLocator(base = 20.0))
 					#ax8.yaxis.set_major_locator(plticker.MultipleLocator(base = 20.0))
 			except Exception as e:
