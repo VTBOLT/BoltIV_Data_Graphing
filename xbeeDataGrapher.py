@@ -68,7 +68,7 @@ def main():
 					textstr = '\n'.join((("Max: {}".format(edgePoints[1][1])),("Min: {}".format(edgePoints[1][0])), "Latest: {}".format(points[1][-1])))
 					ax1.set_title(head[1])#State Of Charge
 					ax1.text(0.02, 0.95, textstr, transform=ax1.transAxes, fontsize=14, verticalalignment='top', bbox=props)
-					#ax1.xaxis.set_visible(False)
+					ax1.xaxis.set_visible(False)
 					#ax1.hlines(95, 0, 100, colors='g', linestyles='dashed', label='')
 					#ax1.hlines(30, 0, 100, colors='y', linestyles='dashed', label='')
 					#ax1.hlines(15, 0, 100, colors='r', linestyles='dashed', label='')
@@ -215,7 +215,7 @@ def main():
 					wheelCir = 1.979 #in meters
 					gearing= 55/14 #number of back sprocket teeth over front sprocket teeth
 					velocity = float(points[2][-1])/60 *wheelCir / gearing #rpm/60*wheel circum/gearing   -> meters per second
-					speed = velocity*2.23694 #convert meters per second to miles per hour
+					speed = round(velocity*2.23694,2) #convert meters per second to miles per hour
 					textstr = '\n'.join((("Max: {}".format(edgePoints[13][1])),("Latest: {}".format(points[13][-1])), ("Speed(MPH): {}".format(speed))))
 					ax8.text(0.02, 0.95, textstr, transform=ax8.transAxes, fontsize=14, verticalalignment='top', bbox=props)
 					ax8.set_title("Motor RPM")
