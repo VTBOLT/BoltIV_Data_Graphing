@@ -15,7 +15,7 @@ def main():
 	print(" +-----------------------------------------+\n")
 
 	device = XBeeDevice(PORT, BAUD_RATE)
-	head = ["Time","State Of Charge","Full Pack Voltage","High Temp","Low Temp","High Voltage","Low Voltage", "RPM", "Aux Battery Voltage","X Acc","Y Acc","Z Acc","X Gyro","Y Gyro","Z Gyro","Z Gyro"]
+	head = ["Time","State Of Charge","Full Pack Voltage","High Temp","Low Temp","High Voltage","Low Voltage", "RPM", "Aux Battery Voltage","X Acc","Y Acc","Z Acc","X Gyro","Y Gyro","Z Gyro"]
 	#head = ["Time","State Of Charge","Full Pack Voltage","High Temp","Low Temp","High Voltage","Low Voltage","Pump Voltage","Aux Battery Voltage","X Acc","Y Acc","Z Acc","X Gyro","Y Gyro","Z Gyro","Roll","Pitch","Yaw","Compass"]
 	points = []
 	edgePoints = []
@@ -77,7 +77,7 @@ def main():
 				ax3.clear()
 				ax3.plot(points[0],points[3],'r')
 				ax3.plot(points[0],points[4],'b')
-				textstr = '\n'.join((("Max: {}".format(edgePoints[3][1])),("Min: {}".format(edgePoints[4][0])), "Latest: {}".format(points[3][-1])))
+				textstr = '\n'.join((("Max: {}".format(points[3][-1])),("Min: {}".format(points[4][-1]))))
 				ax3.set_title("Min/Max Cell Temps")
 				ax3.text(0.03, 0.95, textstr, transform=ax3.transAxes, fontsize=14, verticalalignment='top', bbox=props)
 				ax3.xaxis.set_visible(False)
@@ -95,7 +95,7 @@ def main():
 				ax4.clear()
 				ax4.plot(points[0],points[5],'r')
 				ax4.plot(points[0],points[6],'b')
-				textstr = '\n'.join((("Max: {}".format(edgePoints[5][1])),("Min: {}".format(edgePoints[6][0])), "Latest: {}".format(points[5][-1])))
+				textstr = '\n'.join((("Max: {}".format(points[5][-1])),("Min: {}".format(points[6][-1]))))
 				ax4.set_title("Min/Max Cell Volts")
 				ax4.text(0.03, 0.95, textstr, transform=ax4.transAxes, fontsize=14, verticalalignment='top', bbox=props)
 				ax4.xaxis.set_visible(False)
@@ -164,9 +164,9 @@ def main():
 				ax8.plot(points[0],points[7],'c')
 				wheelCir = 1.979 #in meters
 				gearing= 55/14 #number of back sprocket teeth / front sprocket teeth
-				velocity = float(points[7][-1])/60 *wheelCir / gearing #rpm/60*wheel circum/gearing   -> meters per second
-				speed = round(velocity*2.23694,2) #convert meters per second to miles per hour
-				textstr = '\n'.join((("Max: {}".format(edgePoints[7][1])),("Latest: {}".format(points[7][-1])), ("Speed(MPH): {}".format(speed))))
+				curSpeed = round(float(points[7][-1])/60 *wheelCir / gearing*2.23694,2) #rpm/60*wheel circum/gearing   -> meters per second  convert meters per second to miles per hour
+				maxSpeed = round(float(edgePoints[7][-1])/60 *wheelCir / gearing*2.23694,2)
+				textstr = '\n'.join((("Max RPM: {}".format(edgePoints[7][1])),("Latest RPM: {}".format(points[7][-1])), ("Max MPH: {}".format(maxSpeed)), ("Latest MPH: {}".format(curSpeed))))
 				ax8.text(0.02, 0.95, textstr, transform=ax8.transAxes, fontsize=14, verticalalignment='top', bbox=props)
 				ax8.set_title("Motor RPM")
 				ax8.xaxis.set_visible(False)
