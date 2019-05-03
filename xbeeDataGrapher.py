@@ -15,8 +15,8 @@ def main():
 	print(" +-----------------------------------------+\n")
 
 	device = XBeeDevice(PORT, BAUD_RATE)
-	head = ["Time","State Of Charge","Full Pack Voltage","High Temp","Low Temp","High Voltage","Low Voltage","Pump Voltage","Aux Battery Voltage","X Acc","Y Acc","Z Acc","X Gyro","Y Gyro","Z Gyro"]
-	#head = ["Time","State Of Charge","Full Pack Voltage","High Temp","Low Temp","High Voltage","Low Voltage","Pump Voltage","Aux Battery Voltage","X Acc","Y Acc","Z Acc","X Gyro","Y Gyro","Z Gyro","Roll","Pitch","Yaw","Compas"]
+	head = ["Time","State Of Charge","Full Pack Voltage","High Temp","Low Temp","High Voltage","Low Voltage", "RPM", "Aux Battery Voltage","X Acc","Y Acc","Z Acc","X Gyro","Y Gyro","Z Gyro","Z Gyro"]
+	#head = ["Time","State Of Charge","Full Pack Voltage","High Temp","Low Temp","High Voltage","Low Voltage","Pump Voltage","Aux Battery Voltage","X Acc","Y Acc","Z Acc","X Gyro","Y Gyro","Z Gyro","Roll","Pitch","Yaw","Compass"]
 	points = []
 	edgePoints = []
 	for row in head:
@@ -109,13 +109,13 @@ def main():
 			print('fourth one')
 			pass
 		try:	
-			if (len(points[0]) == len(points[9])) and (len(points[0]) == len(points[12])) and (len(points[0]) == len(points[11])):
+			if (len(points[0]) == len(points[12])) and (len(points[0]) == len(points[13])) and (len(points[0]) == len(points[14])):
 				ax5.cla()
-				ax5.plot(points[9][-1],points[10][-1],'g')
-				ax5.plot(points[9][-1],points[11][-1],'b')
-				textstr = '\n'.join((("Latest X: {}".format(points[9][-1])),("Latest Y: {}".format(points[10][-1])),("Latest Z: {}".format(points[11][-1]))))
+				ax5.plot(points[12][-1],points[13][-1],'go')
+				ax5.plot(points[12][-1],points[14][-1],'bo')
+				textstr = '\n'.join((("Latest X: {}".format(points[12][-1])),("Latest Y: {}".format(points[13][-1])),("Latest Z: {}".format(points[14][-1]))))
 				ax5.text(0.03, 0.95, textstr, transform=ax5.transAxes, fontsize=14, verticalalignment='top', bbox=props)
-				ax5.set_title("IMU Lattitude")
+				ax5.set_title("IMU Gyro")
 				ax5.set_xlim(-2,2)
 				ax5.set_ylim(-2,2)
 				ax5.hlines(-1, -1, 1, colors='g', linestyles='dashed', label='')
@@ -127,13 +127,13 @@ def main():
 			print('fifth one')
 			pass
 		try:	
-			if (len(points[0]) == len(points[10])) and (len(points[0]) == len(points[11])) and (len(points[0]) == len(points[12])):
+			if (len(points[0]) == len(points[9])) and (len(points[0]) == len(points[10])) and (len(points[0]) == len(points[11])):
 				ax6.cla()
-				ax6.plot(points[10][-1],points[11][-1],'g')
-				ax6.plot(points[10][-1],points[12][-1],'b')
-				textstr = '\n'.join((("Latest X: {}".format(points[10][-1])),("Latest Y: {}".format(points[11][-1])),("Latest Z: {}".format(points[12][-1]))))
+				ax6.plot(points[9][-1],points[10][-1],'go')
+				ax6.plot(points[9][-1],points[11][-1],'bo')
+				textstr = '\n'.join((("Latest X: {}".format(points[9][-1])),("Latest Y: {}".format(points[10][-1])),("Latest Z: {}".format(points[11][-1]))))
 				ax6.text(0.03, 0.95, textstr, transform=ax6.transAxes, fontsize=14, verticalalignment='top', bbox=props)
-				ax6.set_title("IMU Gyro")
+				ax6.set_title("IMU Lattitude")
 				ax6.set_xlim(-2,2)
 				ax6.set_ylim(-2,2)
 				ax6.hlines(-1, -1, 1, colors='g', linestyles='dashed', label='')
@@ -145,13 +145,12 @@ def main():
 			print('sixth one')
 			pass
 		try:	
-			if (len(points[0]) == len(points[13])) and (len(points[0]) == len(points[14])):
+			if (len(points[0]) == len(points[8])) and (len(points[0]) == len(points[9])):
 				ax7.cla()
-				ax7.plot(points[0],points[13],'c')
-				ax7.plot(points[0],points[14],'m')
-				textstr = '\n'.join((("Max: {}".format(edgePoints[13][1])),("Min: {}".format(edgePoints[13][0])), "Latest: {}".format(points[13][-1])))
+				ax7.plot(points[0],points[8],'c')
+				textstr = '\n'.join((("Max: {}".format(edgePoints[8][1])),("Min: {}".format(edgePoints[8][0])), "Latest: {}".format(points[8][-1])))
 				ax7.text(0.03, 0.95, textstr, transform=ax7.transAxes, fontsize=14, verticalalignment='top', bbox=props)
-				ax7.set_title("Aux Volt and Pump Volt")
+				ax7.set_title("Aux Volt")
 				ax7.set_ylim(0,20)
 				ax7.grid()
 				ax7.xaxis.set_visible(False)
@@ -160,13 +159,14 @@ def main():
 			print('seventh one')
 			pass
 		try:	
-			if (len(points[0]) == len(points[14])):
+			if (len(points[0]) == len(points[7])):
 				ax8.cla()
+				ax8.plot(points[0],points[7],'c')
 				wheelCir = 1.979 #in meters
-				gearing= 55/14 #number of back sprocket teeth over front sprocket teeth
-				velocity = float(points[2][-1])/60 *wheelCir / gearing #rpm/60*wheel circum/gearing   -> meters per second
+				gearing= 55/14 #number of back sprocket teeth / front sprocket teeth
+				velocity = float(points[7][-1])/60 *wheelCir / gearing #rpm/60*wheel circum/gearing   -> meters per second
 				speed = round(velocity*2.23694,2) #convert meters per second to miles per hour
-				textstr = '\n'.join((("Max: {}".format(edgePoints[13][1])),("Latest: {}".format(points[13][-1])), ("Speed(MPH): {}".format(speed))))
+				textstr = '\n'.join((("Max: {}".format(edgePoints[7][1])),("Latest: {}".format(points[7][-1])), ("Speed(MPH): {}".format(speed))))
 				ax8.text(0.02, 0.95, textstr, transform=ax8.transAxes, fontsize=14, verticalalignment='top', bbox=props)
 				ax8.set_title("Motor RPM")
 				ax8.xaxis.set_visible(False)
@@ -184,18 +184,30 @@ def main():
 				global count
 				message = xbee_message.data.decode()
 				row = [s.strip() for s in message.replace('\x00','').replace('\t','').split(',')]
-				print (row)
+				#print (row)
 				if len(row) == (len(head)-1):
 					points.append([])
 					count +=1
 					points[0].append(count)
 					for i in range(len(row)):
-						points[i+1].append(float(row[i]))
+						datapoint = (float(row[i]))
+						if i == 0:
+							datapoint = datapoint * 0.5
+						elif i == 1:
+							datapoint = datapoint * 0.1
+						elif i == 4 or i == 5:
+							datapoint = datapoint * 0.0001
+						datapoint = round(datapoint, 1)
+						points[i+1].append(datapoint)
 						points[i] = points[i][-200:]
-						if float(row[i]) < edgePoints[i+1][0]:
-							edgePoints[i+1][0] = float(row[i])
-						if float(row[i]) > edgePoints[i+1][1]:
-							edgePoints[i+1][1] = float(row[i])
+						if datapoint < edgePoints[i+1][0]:
+							edgePoints[i+1][0] = datapoint
+						if datapoint > edgePoints[i+1][1]:
+							edgePoints[i+1][1] = datapoint
+				else:
+					print(row)
+					print(len(row))
+					print(len(head))
 			except Exception as e:
 				print(e)
 				print('mesage receive')
