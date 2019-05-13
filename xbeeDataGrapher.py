@@ -15,24 +15,28 @@ def main():
 	print(" +-----------------------------------------+\n")
 
 	device = XBeeDevice(PORT, BAUD_RATE)
-	head = ["Time","State Of Charge","Full Pack Voltage","High Temp","Low Temp","High Voltage","Low Voltage", "RPM", "Aux Battery Voltage","X Acc","Y Acc","Z Acc","X Gyro","Y Gyro","Z Gyro"]
-	#head = ["Time","State Of Charge","Full Pack Voltage","High Temp","Low Temp","High Voltage","Low Voltage","Pump Voltage","Aux Battery Voltage","X Acc","Y Acc","Z Acc","X Gyro","Y Gyro","Z Gyro","Roll","Pitch","Yaw","Compass"]
+	#head = ["Time","State Of Charge","Full Pack Voltage","High Temp","Low Temp","High Voltage","Low Voltage", "RPM", "Aux Battery Voltage","X Acc","Y Acc","Z Acc","X Gyro","Y Gyro","Z Gyro"]
+	head = ["Time","State Of Charge","Full Pack Voltage","High Temp","Low Temp","High Voltage","Low Voltage", "RPM","Motor Temp","Current","Torque","Driver Temp","Aux Battery Voltage","X Acc","Y Acc","Z Acc","X Gyro","Y Gyro","Z Gyro","Roll","Pitch"]
 	points = []
 	edgePoints = []
+	#i=0
 	for row in head:
 		edgePoints.append([float('inf'),float('-inf')])
 		points.append([0])
+		# print(("{} "+row).format(i))
+		# i+=1
 	points[0][0]=1
 	props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
 	fig=plt.figure()
-	ax1=fig.add_subplot(3,2,3)#SOC
+	ax1=fig.add_subplot(3,4,5)#SOC
 	ax2=fig.add_subplot(3,3,2)#FPV
 	ax3=fig.add_subplot(3,3,3)#TEMP
-	ax4=fig.add_subplot(3,3,1)#Volt
-	ax5=fig.add_subplot(3,3,8)#Aux/Pump
-	ax6=fig.add_subplot(3,3,7)#Acc
-	ax7=fig.add_subplot(3,3,9)#Gyro
+	ax4=fig.add_subplot(3,4,6)#Volt
+	ax5=fig.add_subplot(3,3,8)#Motor/MC temp #Angle   , projection='polar'
+	ax6=fig.add_subplot(3,3,7)#Power #Acc
+	ax7=fig.add_subplot(3,3,9)#Aux
 	ax8=fig.add_subplot(3,2,4)#RPM
+	ax9=fig.add_subplot(3,3,1)#Torque, Current
 	checksum_err = 0
 	def animate(i):
 		line_count=points[0][-1]
@@ -53,7 +57,7 @@ def main():
 				print("point0:{0}\tpoint1:{1}".format(len(points[0]), len(points[1])))
 		except Exception as e:
 			print(e)
-			print('first one')
+			print('first plot')
 			pass
 		try:	
 			if len(points[0]) == len(points[2]):
@@ -70,15 +74,15 @@ def main():
 				ax2.hlines(480, line_count-200, line_count, colors='r', linestyles='dashed', label='')
 		except Exception as e:
 			print(e)
-			print('second one')
+			print('second plot')
 			pass
 		try:	
 			if (len(points[0]) == len(points[3])) and (len(points[0]) == len(points[4])):
 				ax3.clear()
 				ax3.plot(points[0],points[3],'r')
 				ax3.plot(points[0],points[4],'b')
-				textstr = '\n'.join((("Max: {}".format(points[3][-1])),("Min: {}".format(points[4][-1]))))
-				ax3.set_title("Min/Max Cell Temps")
+				textstr = '\n'.join((("Max cell: {}".format(points[3][-1])),("Min cell: {}".format(points[4][-1]))))
+				ax3.set_title("Cell Temps")
 				ax3.text(0.03, 0.95, textstr, transform=ax3.transAxes, fontsize=14, verticalalignment='top', bbox=props)
 				ax3.xaxis.set_visible(False)
 				ax3.set_ylim(20,90)
@@ -88,7 +92,7 @@ def main():
 				ax3.hlines(80, line_count-200, line_count, colors='r', linestyles='dashed', label='')
 		except Exception as e:
 			print(e)
-			print('third one')
+			print('third plot')
 			pass
 		try:	
 			if (len(points[0]) == len(points[5])) and (len(points[0]) == len(points[6])):
@@ -106,57 +110,89 @@ def main():
 				ax4.hlines(3.0, line_count-200, line_count, colors='r', linestyles='dashed', label='')
 		except Exception as e:
 			print(e)
-			print('fourth one')
+			print('fourth plot')
 			pass
-		try:	
-			if (len(points[0]) == len(points[12])) and (len(points[0]) == len(points[13])) and (len(points[0]) == len(points[14])):
+		try:
+			if (len(points[0]) == len(points[8])) and (len(points[0]) == len(points[11])):
 				ax5.cla()
-				ax5.plot(points[12][-1],points[13][-1],'go')
-				ax5.plot(points[12][-1],points[14][-1],'bo')
-				textstr = '\n'.join((("Latest X: {}".format(points[12][-1])),("Latest Y: {}".format(points[13][-1])),("Latest Z: {}".format(points[14][-1]))))
+				ax5.plot(points[0],points[8], 'k')
+				ax5.plot(points[0],points[11], 'b')
+				textstr = '\n'.join((("Motor Temp: {}".format(points[8][-1])),("MC Temp: {}".format(points[11][-1]))))
 				ax5.text(0.03, 0.95, textstr, transform=ax5.transAxes, fontsize=14, verticalalignment='top', bbox=props)
-				ax5.set_title("IMU Gyro")
-				ax5.set_xlim(-2,2)
-				ax5.set_ylim(-2,2)
-				ax5.hlines(-1, -1, 1, colors='g', linestyles='dashed', label='')
-				ax5.hlines(1, -1, 1, colors='g', linestyles='dashed', label='')
-				ax5.vlines(-1, -1, 1, colors='g', linestyles='dashed', label='')
-				ax5.vlines(1, -1, 1, colors='g', linestyles='dashed', label='')
+				ax5.set_title("Motor/ Motor Controller Temp")
+				ax5.grid()
+				ax5.set_ylim(20,180)
+				ax5.hlines(80, line_count-200, line_count, colors='y', linestyles='dashed', label='')
+				ax5.hlines(100, line_count-200, line_count, colors='r', linestyles='dashed', label='')
+				ax5.hlines(170, line_count-200, line_count, colors='r', linestyles='dashed', label='')
+				ax5.xaxis.set_visible(False)
+			# ax5.plot([1,(points[15][-1]-180)*np.pi/180],[0, 1],'k', linewidth=5)#points[15][-1]
+			# ax5.vlines(0, 0, 1, colors='g', linestyles='dashed', label='')
+			# ax5.vlines(60*np.pi/180, 0, 1, colors='r', linestyles='dashed', label='')
+			# ax5.vlines(-60*np.pi/180, 0, 1, colors='r', linestyles='dashed', label='')
+			# if i < 10:
+				# number = '0'+str(points[0][-1])
+			# else:
+				# number = str(points[15][-1]-180)
+			# textstr = ''.join((("Angle: {}".format(number))))
+			# ax5.set_title("Lean Angle")
+			# ax5.text(215*np.pi/180, 0.85, textstr,fontsize=14, bbox=props)
+			# ax5.set_rmax(1)
+			# ax5.set_yticklabels([])
+			# ax5.set_theta_zero_location('N')
+			# ax5.set_theta_direction(-1)
+			# ax5.set_thetamin(-90)
+			# ax5.set_thetamax(90)
+			# ax5.grid(True)
 		except Exception as e:
 			print(e)
-			print('fifth one')
+			print('fifth plot')
 			pass
 		try:	
-			if (len(points[0]) == len(points[9])) and (len(points[0]) == len(points[10])) and (len(points[0]) == len(points[11])):
+			if (len(points[0]) == len(points[9])) and (len(points[0]) == len(points[2])):
 				ax6.cla()
-				ax6.plot(points[9][-1],points[10][-1],'go')
-				ax6.plot(points[9][-1],points[11][-1],'bo')
-				textstr = '\n'.join((("Latest X: {}".format(points[9][-1])),("Latest Y: {}".format(points[10][-1])),("Latest Z: {}".format(points[11][-1]))))
+				power=[a*b/1000 for a,b in zip(points[2],points[9])]
+				ax6.plot(points[0],power,'k')
+				textstr = ''.join((("Latest: {}".format(round(power[-1],2)))))
 				ax6.text(0.03, 0.95, textstr, transform=ax6.transAxes, fontsize=14, verticalalignment='top', bbox=props)
-				ax6.set_title("IMU Lattitude")
-				ax6.set_xlim(-2,2)
-				ax6.set_ylim(-2,2)
-				ax6.hlines(-1, -1, 1, colors='g', linestyles='dashed', label='')
-				ax6.hlines(1, -1, 1, colors='g', linestyles='dashed', label='')
-				ax6.vlines(-1, -1, 1, colors='g', linestyles='dashed', label='')
-				ax6.vlines(1, -1, 1, colors='g', linestyles='dashed', label='')
+				ax6.set_title("Power")
+				ax6.xaxis.set_visible(False)
+				ax6.grid()
+				ax6.set_ylim(0,160)
+				#ax6.hlines(-1, -1, 1, colors='g', linestyles='dashed', label='')
+
+				# ax6.cla()
+				# ax6.plot(points[9][-1],points[10][-1],'go')
+				# ax6.plot(points[9][-1],points[11][-1],'bo')
+				# textstr = '\n'.join((("Latest X: {}".format(points[9][-1])),("Latest Y: {}".format(points[10][-1])),("Latest Z: {}".format(points[11][-1]))))
+				# ax6.text(0.03, 0.95, textstr, transform=ax6.transAxes, fontsize=14, verticalalignment='top', bbox=props)
+				# ax6.set_title("IMU Lattitude")
+				# ax6.set_xlim(-2,2)
+				# ax6.set_ylim(-2,2)
+				# ax6.hlines(-1, -1, 1, colors='g', linestyles='dashed', label='')
+				# ax6.hlines(1, -1, 1, colors='g', linestyles='dashed', label='')
+				# ax6.vlines(-1, -1, 1, colors='g', linestyles='dashed', label='')
+				# ax6.vlines(1, -1, 1, colors='g', linestyles='dashed', label='')
 		except Exception as e:
 			print(e)
-			print('sixth one')
+			print('sixth plot')
 			pass
 		try:	
-			if (len(points[0]) == len(points[8])) and (len(points[0]) == len(points[9])):
+			if (len(points[0]) == len(points[12])):
 				ax7.cla()
-				ax7.plot(points[0],points[8],'c')
-				textstr = '\n'.join((("Max: {}".format(edgePoints[8][1])),("Min: {}".format(edgePoints[8][0])), "Latest: {}".format(points[8][-1])))
+				ax7.plot(points[0],points[12],'c')
+				textstr = '\n'.join((("Max: {}".format(edgePoints[12][1])),("Min: {}".format(edgePoints[12][0])), "Latest: {}".format(points[12][-1])))
 				ax7.text(0.03, 0.95, textstr, transform=ax7.transAxes, fontsize=14, verticalalignment='top', bbox=props)
 				ax7.set_title("Aux Volt")
-				ax7.set_ylim(0,20)
+				ax7.hlines(16.8, line_count-200, line_count, colors='g', linestyles='dashed', label='')
+				ax7.hlines(14.5, line_count-200, line_count, colors='y', linestyles='dashed', label='')
+				ax7.hlines(12, line_count-200, line_count, colors='r', linestyles='dashed', label='')
+				ax7.set_ylim(10,18)
 				ax7.grid()
 				ax7.xaxis.set_visible(False)
 		except Exception as e:
 			print(e)
-			print('seventh one')
+			print('seventh plot')
 			pass
 		try:	
 			if (len(points[0]) == len(points[7])):
@@ -175,7 +211,22 @@ def main():
 				ax8.hlines(10000, line_count-200, line_count, colors='g', linestyles='dashed', label='')
 		except Exception as e:
 			print(e)
-			print('eigth one')
+			print('eigth plot')
+			pass
+		try:	
+			if (len(points[0]) == len(points[9])) and (len(points[0]) == len(points[10])):
+				ax9.cla()
+				ax9.plot(points[0],points[9],'k')
+				ax9.plot(points[0],points[10],'g')
+				textstr = '\n'.join((("Torque: {}".format(points[10][-1])),("Current: {}".format(points[9][-1]))))
+				ax9.text(0.03, 0.95, textstr, transform=ax9.transAxes, fontsize=14, verticalalignment='top', bbox=props)
+				ax9.set_title("Torque, Current")
+				ax9.set_ylim(0,200)
+				ax9.grid()
+				ax9.xaxis.set_visible(False)
+		except Exception as e:
+			print(e)
+			print('ninth plot')
 			pass
 	try:
 		device.open()
@@ -197,7 +248,7 @@ def main():
 							datapoint = datapoint * 0.1
 						elif i == 4 or i == 5:
 							datapoint = datapoint * 0.0001
-						datapoint = round(datapoint, 1)
+						datapoint = round(datapoint, 2)
 						points[i+1].append(datapoint)
 						points[i] = points[i][-200:]
 						if datapoint < edgePoints[i+1][0]:
