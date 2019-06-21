@@ -1,0 +1,39 @@
+test one (graph 27):slip
+motor speed limit 12000rpm
+torque limit 240nm
+discharge current limit 330 amp pulse 150 cont.
+
+test two (graph 28):slip
+motor speed limit 12000rpm
+torque limit 240nm
+discharge current limit 330 amp pulse 150 cont.
+
+test three (graph 29):
+motor speed limit 12000rpm
+torque limit 240nm
+discharge current limit 330 amp pulse 150 cont.
+
+test four (graph 30): slip
+motor speed limit 12000rpm
+torque limit 240nm
+discharge current limit 330 amp pulse 150 cont.
+
+test five (graph 31): 10360rpm
+motor speed limit 12000rpm
+torque limit 240nm
+discharge current limit 330 amp pulse 150 cont.
+
+test six (graph 32): 201.9 mph
+motor speed limit 12000rpm
+torque limit 240nm
+discharge current limit 330 amp pulse 150 cont.
+
+test seven (graph 33): slip
+motor speed limit 12000rpm
+torque limit 240nm
+discharge current limit 330 amp pulse 150 cont.
+
+test eight (graph 34):
+motor speed limit 12000rpm
+torque limit 240nm
+discharge current limit 330 amp pulse 150 cont.

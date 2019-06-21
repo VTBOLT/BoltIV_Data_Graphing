@@ -66,7 +66,7 @@ def main():
 				textstr = '\n'.join((("Max: {}".format(edgePoints[2][1])),("Min: {}".format(edgePoints[2][0])), "Latest: {}".format(points[2][-1])))
 				ax2.set_title(head[2])#Full Pack Voltage
 				ax2.text(0.03, 0.95, textstr, transform=ax2.transAxes, fontsize=14, verticalalignment='top', bbox=props)
-				ax2.set_ylim((200,750))
+				ax2.set_ylim((350,750))
 				ax2.grid()
 				ax2.xaxis.set_visible(False)
 				ax2.hlines(698, line_count-200, line_count, colors='b', linestyles='dashed', label='')
@@ -244,7 +244,7 @@ def main():
 						datapoint = (float(row[i]))
 						if i == 0:
 							datapoint = datapoint * 0.5
-						elif i == 1:
+						elif i == 1 or i==9 or i==10:
 							datapoint = datapoint * 0.1
 						elif i == 4 or i == 5:
 							datapoint = datapoint * 0.0001
