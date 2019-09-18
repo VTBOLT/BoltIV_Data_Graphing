@@ -15,7 +15,6 @@ def main():
 	print(" +-----------------------------------------+\n")
 
 	device = XBeeDevice(PORT, BAUD_RATE)
-	#head = ["Time","State Of Charge","Full Pack Voltage","High Temp","Low Temp","High Voltage","Low Voltage", "RPM", "Aux Battery Voltage","X Acc","Y Acc","Z Acc","X Gyro","Y Gyro","Z Gyro"]
 	head = ["Time","State Of Charge","Full Pack Voltage","High Temp","Low Temp","High Voltage","Low Voltage", "RPM","Motor Temp","Current","Torque","Driver Temp","Aux Battery Voltage","X Acc","Y Acc","Z Acc","X Gyro","Y Gyro","Z Gyro","Roll","Pitch"]
 	points = []
 	edgePoints = []
@@ -37,7 +36,6 @@ def main():
 	ax7=fig.add_subplot(3,3,9)#Aux
 	ax8=fig.add_subplot(3,2,4)#RPM
 	ax9=fig.add_subplot(3,3,1)#Torque, Current
-	checksum_err = 0
 	def animate(i):
 		line_count=points[0][-1]
 		try:
@@ -126,24 +124,6 @@ def main():
 				ax5.hlines(100, line_count-200, line_count, colors='r', linestyles='dashed', label='')
 				ax5.hlines(170, line_count-200, line_count, colors='r', linestyles='dashed', label='')
 				ax5.xaxis.set_visible(False)
-			# ax5.plot([1,(points[15][-1]-180)*np.pi/180],[0, 1],'k', linewidth=5)#points[15][-1]
-			# ax5.vlines(0, 0, 1, colors='g', linestyles='dashed', label='')
-			# ax5.vlines(60*np.pi/180, 0, 1, colors='r', linestyles='dashed', label='')
-			# ax5.vlines(-60*np.pi/180, 0, 1, colors='r', linestyles='dashed', label='')
-			# if i < 10:
-				# number = '0'+str(points[0][-1])
-			# else:
-				# number = str(points[15][-1]-180)
-			# textstr = ''.join((("Angle: {}".format(number))))
-			# ax5.set_title("Lean Angle")
-			# ax5.text(215*np.pi/180, 0.85, textstr,fontsize=14, bbox=props)
-			# ax5.set_rmax(1)
-			# ax5.set_yticklabels([])
-			# ax5.set_theta_zero_location('N')
-			# ax5.set_theta_direction(-1)
-			# ax5.set_thetamin(-90)
-			# ax5.set_thetamax(90)
-			# ax5.grid(True)
 		except Exception as e:
 			print(e)
 			print('fifth plot')
@@ -159,20 +139,6 @@ def main():
 				ax6.xaxis.set_visible(False)
 				ax6.grid()
 				ax6.set_ylim(0,160)
-				#ax6.hlines(-1, -1, 1, colors='g', linestyles='dashed', label='')
-
-				# ax6.cla()
-				# ax6.plot(points[9][-1],points[10][-1],'go')
-				# ax6.plot(points[9][-1],points[11][-1],'bo')
-				# textstr = '\n'.join((("Latest X: {}".format(points[9][-1])),("Latest Y: {}".format(points[10][-1])),("Latest Z: {}".format(points[11][-1]))))
-				# ax6.text(0.03, 0.95, textstr, transform=ax6.transAxes, fontsize=14, verticalalignment='top', bbox=props)
-				# ax6.set_title("IMU Lattitude")
-				# ax6.set_xlim(-2,2)
-				# ax6.set_ylim(-2,2)
-				# ax6.hlines(-1, -1, 1, colors='g', linestyles='dashed', label='')
-				# ax6.hlines(1, -1, 1, colors='g', linestyles='dashed', label='')
-				# ax6.vlines(-1, -1, 1, colors='g', linestyles='dashed', label='')
-				# ax6.vlines(1, -1, 1, colors='g', linestyles='dashed', label='')
 		except Exception as e:
 			print(e)
 			print('sixth plot')
