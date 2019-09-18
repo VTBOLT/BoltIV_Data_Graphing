@@ -5,17 +5,73 @@ import matplotlib.ticker as plticker
 import matplotlib.animation as animation
 from matplotlib import style
 import numpy as np
-PORT = "COM6"
-BAUD_RATE = 57600
-count = 0
+
+class XbeeDataGrapher():
+	def __init__(self):
+		self.count = 0
+		self.points = []
+		self.edge_points = []
+		self.points[0][0] = 1
+		self.props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
+		self.head = ["Time","State Of Charge","Full Pack Voltage","High Temp","Low Temp","High Voltage","Low Voltage", "RPM","Motor Temp","Current","Torque","Driver Temp","Aux Battery Voltage","X Acc","Y Acc","Z Acc","X Gyro","Y Gyro","Z Gyro","Roll","Pitch"]
+
+	def xbee_setup(self, com = "COM6", baud = 57600):
+		self.device = XBeeDevice(com, baud)
+
+	def graph_setup(self):
+		
+		fig = plt.figure()
+		
+		self.soc_plot=fig.add_subplot(3,4,5)#SOC
+		self.fpv_plot = fig.add_subplot(3,3,2)#FPV
+		self.temp_plot = fig.add_subplot(3,3,3)#TEMP
+		self.vlotage_plot = fig.add_subplot(3,4,6)#Volt
+		self.motor_mc_temp_plot = fig.add_subplot(3,3,8)#Motor/MC temp #Angle   , projection='polar'
+		self.power_plot = fig.add_subplot(3,3,7)#Power #Acc
+		self.aux_bat_voltage_plot = fig.add_subplot(3,3,9)#Aux
+		self.rmp_plot = fig.add_subplot(3,2,4)#RPM
+		self.torque_plot = fig.add_subplot(3,3,1)#Torque, Current
+
+
+	def data_receive(self, xbee_message):
+		try:
+				message = xbee_message.data.decode()
+				row = [s.strip() for s in message.replace('\x00','').replace('\t','').split(',')]
+				#print (row)
+				if len(row) == (len(self.head)-1):
+					points.append([])
+					self.count +=1
+					self.points[0].append(self.count)
+					for i in range(len(row)):
+						datapoint = (float(row[i]))
+						if i == 0:
+							datapoint = datapoint * 0.5
+						elif i == 1 or i==9 or i==10:
+							datapoint = datapoint * 0.1
+						elif i == 4 or i == 5:
+							datapoint = datapoint * 0.0001
+						datapoint = round(datapoint, 2)
+						self.points[i+1].append(datapoint)
+						self.points[i] = points[i][-200:]
+						if datapoint < self.edgePoints[i+1][0]:
+							self.edgePoints[i+1][0] = datapoint
+						if datapoint > self.edgePoints[i+1][1]:
+							self.edgePoints[i+1][1] = datapoint
+				else:
+					print(row)
+					print(len(row))
+					print(len(self.head))
+		except Exception as e:
+			print(e)
+			print('mesage receive')
+			pass
+
 
 def main():
 	print(" +-----------------------------------------+")
 	print(" |    Python Xbee Receive And Graph Data   |")
 	print(" +-----------------------------------------+\n")
 
-	device = XBeeDevice(PORT, BAUD_RATE)
-	head = ["Time","State Of Charge","Full Pack Voltage","High Temp","Low Temp","High Voltage","Low Voltage", "RPM","Motor Temp","Current","Torque","Driver Temp","Aux Battery Voltage","X Acc","Y Acc","Z Acc","X Gyro","Y Gyro","Z Gyro","Roll","Pitch"]
 	points = []
 	edgePoints = []
 	#i=0
@@ -36,6 +92,7 @@ def main():
 	ax7=fig.add_subplot(3,3,9)#Aux
 	ax8=fig.add_subplot(3,2,4)#RPM
 	ax9=fig.add_subplot(3,3,1)#Torque, Current
+	
 	def animate(i):
 		line_count=points[0][-1]
 		try:
