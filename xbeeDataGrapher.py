@@ -30,7 +30,7 @@ class XbeeDataGrapher():
 		self.soc_plot=fig.add_subplot(3,4,5)#SOC
 		self.fpv_plot = fig.add_subplot(3,3,2)#FPV
 		self.temp_plot = fig.add_subplot(3,3,3)#TEMP
-		self.vlotage_plot = fig.add_subplot(3,4,6)#Volt
+		self.voltage_plot = fig.add_subplot(3,4,6)#Volt
 		self.motor_mc_temp_plot = fig.add_subplot(3,3,8)#Motor/MC temp #Angle   , projection='polar'
 		self.power_plot = fig.add_subplot(3,3,7)#Power #Acc
 		self.aux_bat_voltage_plot = fig.add_subplot(3,3,9)#Aux
@@ -46,7 +46,7 @@ class XbeeDataGrapher():
 				row = [s.strip() for s in message.replace('\x00','').replace('\t','').split(',')]
 				#print (row)
 				if len(row) == (len(self.head)-1):
-					points.append([])
+					self.points.append([])
 					self.count +=1
 					self.points[0].append(self.count)
 					for i in range(len(row)):
@@ -59,11 +59,11 @@ class XbeeDataGrapher():
 							datapoint = datapoint * 0.0001
 						datapoint = round(datapoint, 2)
 						self.points[i+1].append(datapoint)
-						self.points[i] = points[i][-200:]
-						if datapoint < self.self.edge_points[i+1][0]:
-							self.self.edge_points[i+1][0] = datapoint
-						if datapoint > self.self.edge_points[i+1][1]:
-							self.self.edge_points[i+1][1] = datapoint
+						self.points[i] = self.points[i][-200:]
+						if datapoint < self.edge_points[i+1][0]:
+							self.edge_points[i+1][0] = datapoint
+						if datapoint > self.edge_points[i+1][1]:
+							self.edge_points[i+1][1] = datapoint
 				else:
 					print(row)
 					print(len(row))
@@ -76,65 +76,65 @@ class XbeeDataGrapher():
 	def animate(self):
 		line_count=self.points[0][-1]
 		try:
-			if len(points[0]) == len(points[1]):
-				self._graph_soc()
+			if len(self.points[0]) == len(self.points[1]):
+				self._graph_soc(line_count)
 			else:
-				print("point0:{0}\tpoint1:{1}".format(len(points[0]), len(points[1])))
+				print("point0:{0}\tpoint1:{1}".format(len(self.points[0]), len(self.points[1])))
 		except Exception as e:
 			print(e)
 			print('first plot')
 			pass
 		try:	
-			if len(points[0]) == len(points[2]):
+			if len(self.points[0]) == len(self.points[2]):
 				self._graph_fpv(line_count)
 		except Exception as e:
 			print(e)
 			print('second plot')
 			pass
 		try:	
-			if (len(points[0]) == len(points[3])) and (len(points[0]) == len(points[4])):
+			if (len(self.points[0]) == len(self.points[3])) and (len(self.points[0]) == len(self.points[4])):
 				self._graph_temp(line_count)
 		except Exception as e:
 			print(e)
 			print('third plot')
 			pass
 		try:	
-			if (len(points[0]) == len(points[5])) and (len(points[0]) == len(points[6])):
+			if (len(self.points[0]) == len(self.points[5])) and (len(self.points[0]) == len(self.points[6])):
 				self._graph_voltage(line_count)
 		except Exception as e:
 			print(e)
 			print('fourth plot')
 			pass
 		try:
-			if (len(points[0]) == len(points[8])) and (len(points[0]) == len(points[11])):
+			if (len(self.points[0]) == len(self.points[8])) and (len(self.points[0]) == len(self.points[11])):
 				self._graph_motor_mc_temp(line_count)
 		except Exception as e:
 			print(e)
 			print('fifth plot')
 			pass
 		try:	
-			if (len(points[0]) == len(points[9])) and (len(points[0]) == len(points[2])):
+			if (len(self.points[0]) == len(self.points[9])) and (len(self.points[0]) == len(self.points[2])):
 				self._graph_power(line_count)
 		except Exception as e:
 			print(e)
 			print('sixth plot')
 			pass
 		try:	
-			if (len(points[0]) == len(points[12])):
+			if (len(self.points[0]) == len(self.points[12])):
 				self._graph_aux_bat_voltage(line_count)
 		except Exception as e:
 			print(e)
 			print('seventh plot')
 			pass
 		try:	
-			if (len(points[0]) == len(points[7])):
+			if (len(self.points[0]) == len(self.points[7])):
 				self._graph_rpm(line_count)
 		except Exception as e:
 			print(e)
 			print('eigth plot')
 			pass
 		try:	
-			if (len(points[0]) == len(points[9])) and (len(points[0]) == len(points[10])):
+			if (len(self.points[0]) == len(self.points[9])) and (len(self.points[0]) == len(self.points[10])):
 				self._graph_torque(line_count)
 		except Exception as e:
 			print(e)
@@ -168,7 +168,7 @@ class XbeeDataGrapher():
 			else:
 				print(row)
 				print(len(row))
-				print(len(head))
+				print(len(self.head))
 
 		except Exception as e:
 			print(e)
@@ -177,10 +177,10 @@ class XbeeDataGrapher():
 	
 	def _graph_soc(self, line_count):
 		self.soc_plot.clear()
-		self.soc_plot.plot(points[0],points[1],'k')
-		textstr = '\n'.join((("Max: {}".format(self.edge_points[1][1])),("Min: {}".format(self.edge_points[1][0])), "Latest: {}".format(points[1][-1])))
-		self.soc_plot.set_title(head[1])#State Of Charge
-		self.soc_plot.text(0.02, 0.95, textstr, transform=self.soc_plot.transAxes, fontsize=14, verticalalignment='top', bbox=props)
+		self.soc_plot.plot(self.points[0],self.points[1],'k')
+		textstr = '\n'.join((("Max: {}".format(self.edge_points[1][1])),("Min: {}".format(self.edge_points[1][0])), "Latest: {}".format(self.points[1][-1])))
+		self.soc_plot.set_title(self.head[1])#State Of Charge
+		self.soc_plot.text(0.02, 0.95, textstr, transform=self.soc_plot.transAxes, fontsize=14, verticalalignment='top', bbox=self.props)
 		self.soc_plot.set_ylim([0,100])
 		self.soc_plot.grid()
 		self.soc_plot.xaxis.set_visible(False)
@@ -190,10 +190,10 @@ class XbeeDataGrapher():
 	
 	def _graph_fpv(self, line_count):
 		self.fpv_plot.clear()
-		self.fpv_plot.plot(points[0],points[2],'g')
-		textstr = '\n'.join((("Max: {}".format(self.edge_points[2][1])),("Min: {}".format(self.edge_points[2][0])), "Latest: {}".format(points[2][-1])))
-		self.fpv_plot.set_title(head[2])#Full Pack Voltage
-		self.fpv_plot.text(0.03, 0.95, textstr, transform=self.fpv_plot.transAxes, fontsize=14, verticalalignment='top', bbox=props)
+		self.fpv_plot.plot(self.points[0],self.points[2],'g')
+		textstr = '\n'.join((("Max: {}".format(self.edge_points[2][1])),("Min: {}".format(self.edge_points[2][0])), "Latest: {}".format(self.points[2][-1])))
+		self.fpv_plot.set_title(self.head[2])#Full Pack Voltage
+		self.fpv_plot.text(0.03, 0.95, textstr, transform=self.fpv_plot.transAxes, fontsize=14, verticalalignment='top', bbox=self.props)
 		self.fpv_plot.set_ylim((350,750))
 		self.fpv_plot.grid()
 		self.fpv_plot.xaxis.set_visible(False)
@@ -203,11 +203,11 @@ class XbeeDataGrapher():
 
 	def _graph_temp(self, line_count):
 		self.temp_plot.clear()
-		self.temp_plot.plot(points[0],points[3],'r')
-		self.temp_plot.plot(points[0],points[4],'b')
-		textstr = '\n'.join((("Max cell: {}".format(points[3][-1])),("Min cell: {}".format(points[4][-1]))))
+		self.temp_plot.plot(self.points[0],self.points[3],'r')
+		self.temp_plot.plot(self.points[0],self.points[4],'b')
+		textstr = '\n'.join((("Max cell: {}".format(self.points[3][-1])),("Min cell: {}".format(self.points[4][-1]))))
 		self.temp_plot.set_title("Cell Temps")
-		self.temp_plot.text(0.03, 0.95, textstr, transform=self.temp_plot.transAxes, fontsize=14, verticalalignment='top', bbox=props)
+		self.temp_plot.text(0.03, 0.95, textstr, transform=self.temp_plot.transAxes, fontsize=14, verticalalignment='top', bbox=self.props)
 		self.temp_plot.xaxis.set_visible(False)
 		self.temp_plot.set_ylim(20,90)
 		self.temp_plot.grid()
@@ -217,11 +217,11 @@ class XbeeDataGrapher():
 
 	def _graph_voltage(self, line_count):
 		self.voltage_plot.clear()
-		self.voltage_plot.plot(points[0],points[5],'r')
-		self.voltage_plot.plot(points[0],points[6],'b')
-		textstr = '\n'.join((("Max: {}".format(points[5][-1])),("Min: {}".format(points[6][-1]))))
+		self.voltage_plot.plot(self.points[0],self.points[5],'r')
+		self.voltage_plot.plot(self.points[0],self.points[6],'b')
+		textstr = '\n'.join((("Max: {}".format(self.points[5][-1])),("Min: {}".format(self.points[6][-1]))))
 		self.voltage_plot.set_title("Min/Max Cell Volts")
-		self.voltage_plot.text(0.03, 0.95, textstr, transform=self.voltage_plot.transAxes, fontsize=14, verticalalignment='top', bbox=props)
+		self.voltage_plot.text(0.03, 0.95, textstr, transform=self.voltage_plot.transAxes, fontsize=14, verticalalignment='top', bbox=self.props)
 		self.voltage_plot.xaxis.set_visible(False)
 		self.voltage_plot.grid()
 		self.voltage_plot.set_ylim(1,5)
@@ -231,10 +231,10 @@ class XbeeDataGrapher():
 
 	def _graph_motor_mc_temp(self, line_count):
 		self.motor_mc_temp_plot.cla()
-		self.motor_mc_temp_plot.plot(points[0],points[8], 'k')
-		self.motor_mc_temp_plot.plot(points[0],points[11], 'b')
-		textstr = '\n'.join((("Motor Temp: {}".format(points[8][-1])),("MC Temp: {}".format(points[11][-1]))))
-		self.motor_mc_temp_plot.text(0.03, 0.95, textstr, transform=self.motor_mc_temp_plot.transAxes, fontsize=14, verticalalignment='top', bbox=props)
+		self.motor_mc_temp_plot.plot(self.points[0],self.points[8], 'k')
+		self.motor_mc_temp_plot.plot(self.points[0],self.points[11], 'b')
+		textstr = '\n'.join((("Motor Temp: {}".format(self.points[8][-1])),("MC Temp: {}".format(self.points[11][-1]))))
+		self.motor_mc_temp_plot.text(0.03, 0.95, textstr, transform=self.motor_mc_temp_plot.transAxes, fontsize=14, verticalalignment='top', bbox=self.props)
 		self.motor_mc_temp_plot.set_title("Motor/ Motor Controller Temp")
 		self.motor_mc_temp_plot.grid()
 		self.motor_mc_temp_plot.set_ylim(20,180)
@@ -245,10 +245,10 @@ class XbeeDataGrapher():
 	
 	def _graph_power(self, line_count):
 		self.power_plot.cla()
-		power=[a*b/1000 for a,b in zip(points[2],points[9])]
-		self.power_plot.plot(points[0],power,'k')
+		power=[a*b/1000 for a,b in zip(self.points[2],self.points[9])]
+		self.power_plot.plot(self.points[0],power,'k')
 		textstr = ''.join((("Latest: {}".format(round(power[-1],2)))))
-		self.power_plot.text(0.03, 0.95, textstr, transform=self.power_plot.transAxes, fontsize=14, verticalalignment='top', bbox=props)
+		self.power_plot.text(0.03, 0.95, textstr, transform=self.power_plot.transAxes, fontsize=14, verticalalignment='top', bbox=self.props)
 		self.power_plot.set_title("Power")
 		self.power_plot.xaxis.set_visible(False)
 		self.power_plot.grid()
@@ -256,9 +256,9 @@ class XbeeDataGrapher():
 
 	def _graph_aux_bat_voltage(self, line_count):
 		self.aux_bat_voltage_plot.cla()
-		self.aux_bat_voltage_plot.plot(points[0],points[12],'c')
-		textstr = '\n'.join((("Max: {}".format(self.edge_points[12][1])),("Min: {}".format(self.edge_points[12][0])), "Latest: {}".format(points[12][-1])))
-		self.aux_bat_voltage_plot.text(0.03, 0.95, textstr, transform=self.aux_bat_voltage_plot.transAxes, fontsize=14, verticalalignment='top', bbox=props)
+		self.aux_bat_voltage_plot.plot(self.points[0],self.points[12],'c')
+		textstr = '\n'.join((("Max: {}".format(self.edge_points[12][1])),("Min: {}".format(self.edge_points[12][0])), "Latest: {}".format(self.points[12][-1])))
+		self.aux_bat_voltage_plot.text(0.03, 0.95, textstr, transform=self.aux_bat_voltage_plot.transAxes, fontsize=14, verticalalignment='top', bbox=self.props)
 		self.aux_bat_voltage_plot.set_title("Aux Volt")
 		self.aux_bat_voltage_plot.hlines(16.8, line_count-200, line_count, colors='g', linestyles='dashed', label='')
 		self.aux_bat_voltage_plot.hlines(14.5, line_count-200, line_count, colors='y', linestyles='dashed', label='')
@@ -269,13 +269,13 @@ class XbeeDataGrapher():
 
 	def _graph_rpm(self, line_count):
 		self.rpm_plot.cla()
-		self.rpm_plot.plot(points[0],points[7],'c')
+		self.rpm_plot.plot(self.points[0],self.points[7],'c')
 		wheelCir = 1.979 #in meters
 		gearing= 55/14 #number of back sprocket teeth / front sprocket teeth
-		curSpeed = round(float(points[7][-1])/60 *wheelCir / gearing*2.23694,2) #rpm/60*wheel circum/gearing   -> meters per second  convert meters per second to miles per hour
+		curSpeed = round(float(self.points[7][-1])/60 *wheelCir / gearing*2.23694,2) #rpm/60*wheel circum/gearing   -> meters per second  convert meters per second to miles per hour
 		maxSpeed = round(float(self.edge_points[7][-1])/60 *wheelCir / gearing*2.23694,2)
-		textstr = '\n'.join((("Max RPM: {}".format(self.edge_points[7][1])),("Latest RPM: {}".format(points[7][-1])), ("Max MPH: {}".format(maxSpeed)), ("Latest MPH: {}".format(curSpeed))))
-		self.rpm_plot.text(0.02, 0.95, textstr, transform=self.rpm_plot.transAxes, fontsize=14, verticalalignment='top', bbox=props)
+		textstr = '\n'.join((("Max RPM: {}".format(self.edge_points[7][1])),("Latest RPM: {}".format(self.points[7][-1])), ("Max MPH: {}".format(maxSpeed)), ("Latest MPH: {}".format(curSpeed))))
+		self.rpm_plot.text(0.02, 0.95, textstr, transform=self.rpm_plot.transAxes, fontsize=14, verticalalignment='top', bbox=self.props)
 		self.rpm_plot.set_title("Motor RPM")
 		self.rpm_plot.xaxis.set_visible(False)
 		self.rpm_plot.set_ylim(0,12000)
@@ -284,10 +284,10 @@ class XbeeDataGrapher():
 
 	def _graph_torque(self, line_count):
 		self.torque_plot.cla()
-		self.torque_plot.plot(points[0],points[9],'k')
-		self.torque_plot.plot(points[0],points[10],'g')
-		textstr = '\n'.join((("Torque: {}".format(points[10][-1])),("Current: {}".format(points[9][-1]))))
-		self.torque_plot.text(0.03, 0.95, textstr, transform=self.torque_plot.transAxes, fontsize=14, verticalalignment='top', bbox=props)
+		self.torque_plot.plot(self.points[0],self.points[9],'k')
+		self.torque_plot.plot(self.points[0],self.points[10],'g')
+		textstr = '\n'.join((("Torque: {}".format(self.points[10][-1])),("Current: {}".format(self.points[9][-1]))))
+		self.torque_plot.text(0.03, 0.95, textstr, transform=self.torque_plot.transAxes, fontsize=14, verticalalignment='top', bbox=self.props)
 		self.torque_plot.set_title("Torque, Current")
 		self.torque_plot.set_ylim(0,200)
 		self.torque_plot.grid()
@@ -295,7 +295,7 @@ class XbeeDataGrapher():
 
 
 if __name__ == '__main__':
-    grapher = XbeeDataGrapher()
+	grapher = XbeeDataGrapher()
 	grapher.xbee_setup()
 	grapher.graph_setup()
 	mng = plt.get_current_fig_manager()
