@@ -5,18 +5,22 @@ import matplotlib.ticker as plticker
 import matplotlib.animation as animation
 from matplotlib import style
 import numpy as np
+import sys, os
 
 class XbeeDataGrapher():
 	def __init__(self):
 		self.count = 0
-		self.points = []
-		self.edge_points = []
-		self.points[0][0] = 1
+		self.points = [[]]
+		self.edge_points = [[]]
+		self.points[0].append([1])
 		self.props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
-		self.head = ["Time","State Of Charge","Full Pack Voltage","High Temp","Low Temp","High Voltage","Low Voltage", "RPM","Motor Temp","Current","Torque","Driver Temp","Aux Battery Voltage","X Acc","Y Acc","Z Acc","X Gyro","Y Gyro","Z Gyro","Roll","Pitch"]
+		self.head = ["Time","State Of Charge","Full Pack Voltage","High Temp","Low Temp",
+		"High Voltage","Low Voltage", "RPM","Motor Temp","Current","Torque","Driver Temp",
+		"Aux Battery Voltage","X Acc","Y Acc","Z Acc","X Gyro","Y Gyro","Z Gyro","Roll","Pitch"]
 
-	def xbee_setup(self, com = "COM6", baud = 57600):
+	def xbee_setup(self, com = "COM8", baud = 57600):
 		self.device = XBeeDevice(com, baud)
+		self.device.open()
 		self.device.add_data_received_callback(self._data_receive_callback)
 
 	
@@ -40,38 +44,6 @@ class XbeeDataGrapher():
 		animation.FuncAnimation(fig, self.animate, interval=10)
 
 
-	def data_receive(self, xbee_message):
-		try:
-				message = xbee_message.data.decode()
-				row = [s.strip() for s in message.replace('\x00','').replace('\t','').split(',')]
-				#print (row)
-				if len(row) == (len(self.head)-1):
-					self.points.append([])
-					self.count +=1
-					self.points[0].append(self.count)
-					for i in range(len(row)):
-						datapoint = (float(row[i]))
-						if i == 0:
-							datapoint = datapoint * 0.5
-						elif i == 1 or i==9 or i==10:
-							datapoint = datapoint * 0.1
-						elif i == 4 or i == 5:
-							datapoint = datapoint * 0.0001
-						datapoint = round(datapoint, 2)
-						self.points[i+1].append(datapoint)
-						self.points[i] = self.points[i][-200:]
-						if datapoint < self.edge_points[i+1][0]:
-							self.edge_points[i+1][0] = datapoint
-						if datapoint > self.edge_points[i+1][1]:
-							self.edge_points[i+1][1] = datapoint
-				else:
-					print(row)
-					print(len(row))
-					print(len(self.head))
-		except Exception as e:
-			print(e)
-			print('mesage receive')
-			pass
 	
 	def animate(self):
 		line_count=self.points[0][-1]
@@ -145,7 +117,6 @@ class XbeeDataGrapher():
 		try:
 			message = xbee_message.data.decode()
 			row = [s.strip() for s in message.replace('\x00','').replace('\t','').split(',')]
-			#print (row)
 			if len(row) == (len(self.head)-1):
 				self.points.append([])
 				self.count +=1
@@ -159,18 +130,24 @@ class XbeeDataGrapher():
 					elif i == 4 or i == 5:
 						datapoint = datapoint * 0.0001
 					datapoint = round(datapoint, 2)
-					self.points[i+1].append(datapoint)
+					self.points[i].append(datapoint)
 					self.points[i] = self.points[i][-200:]
-					if datapoint < self.edge_points[i+1][0]:
-						self.edge_points[i+1][0] = datapoint
-					if datapoint > self.edge_points[i+1][1]:
-						self.edge_points[i+1][1] = datapoint
+					if len(self.edge_points[i]) == 0:
+						self.edge_points.append([datapoint, datapoint])
+					else:
+						if datapoint < self.edge_points[i][0]:
+							self.edge_points[i][0] = datapoint
+						if datapoint > self.edge_points[i][1]:
+							self.edge_points[i][1] = datapoint
 			else:
 				print(row)
 				print(len(row))
 				print(len(self.head))
 
-		except Exception as e:
+		except Exception as e:		
+			exc_type, exc_obj, exc_tb = sys.exc_info()
+			fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+			print(exc_type, fname, exc_tb.tb_lineno)
 			print(e)
 			print('mesage receive')
 			pass
