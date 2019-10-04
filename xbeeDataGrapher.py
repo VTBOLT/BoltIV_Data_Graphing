@@ -10,15 +10,18 @@ import sys, os
 class XbeeDataGrapher():
 	def __init__(self):
 		self.count = 0
-		self.points = [[]]
-		self.edge_points = [[]]
-		self.points[0].append([1])
+		self.points = []
+		self.edge_points = []
 		self.props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
 		self.head = ["Time","State Of Charge","Full Pack Voltage","High Temp","Low Temp",
 		"High Voltage","Low Voltage", "RPM","Motor Temp","Current","Torque","Driver Temp",
 		"Aux Battery Voltage","X Acc","Y Acc","Z Acc","X Gyro","Y Gyro","Z Gyro","Roll","Pitch"]
+		for row in self.head:
+			self.edge_points.append([float('inf'),float('-inf')])
+			self.points.append([0])
+		self.points[0][0]=1
 
-	def xbee_setup(self, com = "COM8", baud = 57600):
+	def xbee_setup(self, com = "COM4", baud = 57600):
 		self.device = XBeeDevice(com, baud)
 		self.device.open()
 		self.device.add_data_received_callback(self._data_receive_callback)
@@ -117,6 +120,7 @@ class XbeeDataGrapher():
 		try:
 			message = xbee_message.data.decode()
 			row = [s.strip() for s in message.replace('\x00','').replace('\t','').split(',')]
+			#print(row)
 			if len(row) == (len(self.head)-1):
 				self.points.append([])
 				self.count +=1
